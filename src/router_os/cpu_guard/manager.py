@@ -1,16 +1,4 @@
-"""CPU reservation and overload monitoring.
-
-The guard reserves the last logical CPU when the system has an odd number of
-logical CPUs >= 3. The reserved CPU is deliberately kept out of the routing
-worker affinity set. It is not disabled: Linux may still schedule kernel work
-or unrelated processes there. Packet/routing workers must honor the returned
-allowed CPU set.
-
-When any non-reserved CPU reaches the warning threshold, a structured alert
-is emitted for LAN, WAN and Router-CA consumers. At 100%, the alert is marked
-critical. Consumers can register callbacks without coupling this module to
-those subsystems.
-"""
+"""CPU reservation and overload monitoring."""
 
 from __future__ import annotations
 
@@ -60,8 +48,7 @@ class CpuGuard:
         return "UNKNOWN"
 
     def evaluate(self, cpu: int, utilization: float) -> CpuAlert | None:
-        if cpu == self.reserved_cpu:
-            return None
+        """Evaluate every CPU; the reserved CPU may generate alerts but never routes packets."""
         utilization = max(0.0, min(float(utilization), 100.0))
         if utilization >= self.CRITICAL:
             severity = "CRITICAL"
@@ -90,6 +77,8 @@ def read_cpu_times() -> dict[int, tuple[int, int]]:
             cpu = int(fields[0][3:])
             values = [int(v) for v in fields[1:]]
         except (ValueError, IndexError):
+            continue
+        if len(values) < 4:
             continue
         idle = values[3] + (values[4] if len(values) > 4 else 0)
         total = sum(values)
