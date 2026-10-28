@@ -1,1 +1,1 @@
-NLS-NetOS scaffold
+"""Control-plane components."""

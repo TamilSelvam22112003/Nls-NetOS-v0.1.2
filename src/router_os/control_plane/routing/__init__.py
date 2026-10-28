@@ -1,1 +1,1 @@
-NLS-NetOS scaffold
+"""Routing control-plane integration boundaries."""

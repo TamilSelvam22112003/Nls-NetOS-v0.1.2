@@ -1,1 +1,3 @@
-NLS-NetOS scaffold
+"""Version metadata."""
+
+VERSION = "0.1.2"
