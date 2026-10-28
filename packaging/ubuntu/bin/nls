@@ -1,4 +1,5 @@
 #!/bin/sh
 set -eu
 
+export PYTHONPATH="/usr/lib/nls-netos${PYTHONPATH:+:${PYTHONPATH}}"
 exec python3 -m router_os.cli "$@"
