@@ -1,1 +1,4 @@
-NLS-NetOS scaffold content placeholder
+"""NLS-NetOS user-space prototype package.
+
+The package currently contains only a minimal CLI scaffold.
+"""

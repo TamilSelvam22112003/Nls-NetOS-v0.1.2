@@ -1,1 +1,1 @@
-NLS-NetOS scaffold content placeholder
+"""Control-plane components."""
