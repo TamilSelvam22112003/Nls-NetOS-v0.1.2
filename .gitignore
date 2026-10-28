@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -11,8 +10,6 @@ venv/
 htmlcov/
 .mypy_cache/
 .ruff_cache/
-
-# Environment and secrets
 .env
 .env.*
 !.env.example
@@ -22,16 +19,12 @@ htmlcov/
 *.pfx
 secrets/
 private/
-
-# Local runtime data
 *.db
 *.sqlite
 *.sqlite3
 var/
 logs/
 *.log
-
-# Editors / OS
 .vscode/
 .idea/
 .DS_Store
