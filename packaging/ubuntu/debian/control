@@ -1,0 +1,20 @@
+Source: nls-netos
+Section: net
+Priority: optional
+Maintainer: NLS-NetOS Project
+Build-Depends: debhelper-compat (= 13), dpkg-dev, pkg-config, build-essential, libdpdk-dev
+Standards-Version: 4.6.2
+Rules-Requires-Root: binary-targets
+
+Package: nls-netos
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3, dpdk
+Recommends: linux-tools-common
+Description: NLS-NetOS router operating system platform
+ NLS-NetOS is a Linux-based router operating-system project providing
+ platform discovery, CPU and memory management, routing/forwarding
+ components, cryptography, Router-CA, IPsec, TLS, database support,
+ and a native DPDK packet-forwarding component.
+ .
+ The packaged native forwarder uses DPDK's PMD layer for hardware-specific
+ NIC operations; it does not directly program vendor MMIO registers.
