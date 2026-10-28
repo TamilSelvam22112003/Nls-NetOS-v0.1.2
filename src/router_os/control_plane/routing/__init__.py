@@ -1,1 +1,1 @@
-"""Routing control-plane integration boundaries."""
+NLS-NetOS scaffold content placeholder
