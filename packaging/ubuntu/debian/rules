@@ -12,10 +12,7 @@ override_dh_auto_build:
 	$(MAKE) -C ../../../platform/drivers/nic -f Makefile
 
 override_dh_auto_install:
-	install -D -m 0755 ../../../platform/drivers/nic/nls-dpdk-forwarder debian/nls-netos/usr/lib/nls-netos/nls-dpdk-forwarder
-	install -d -m 0755 debian/nls-netos/usr/lib/nls-netos
-	cp -a ../../../src/router_os debian/nls-netos/usr/lib/nls-netos/
-	install -D -m 0755 ../../../packaging/ubuntu/bin/nls debian/nls-netos/usr/bin/nls
+	@echo "NLS-NetOS: files are installed by dh_install"
 
 override_dh_auto_test:
 	@echo "NLS-NetOS: tests are not run by the package build"
