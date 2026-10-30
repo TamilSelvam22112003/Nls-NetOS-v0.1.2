@@ -3,25 +3,20 @@ from __future__ import annotations
 
 import secrets
 
-try:
-    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-except ImportError:  # pragma: no cover
-    Ed25519PrivateKey = None
+from .asymmetric.rsa import generate_private_key, private_key_der, public_key_der
 
 
 class KeyGenerator:
-    """Generate key material without persisting it."""
+    """Generate NLS key material without persisting it."""
 
     @staticmethod
     def synchronous_key(size: int = 32) -> bytes:
+        if size < 32:
+            raise ValueError("NLS synchronous keys must be at least 256 bits")
         return secrets.token_bytes(size)
 
     @staticmethod
     def asymmetric_keypair() -> tuple[bytes, bytes]:
-        if Ed25519PrivateKey is None:
-            raise RuntimeError("cryptography package is required for asymmetric keys")
-        private = Ed25519PrivateKey.generate()
-        return (
-            private.private_bytes_raw(),
-            private.public_key().public_bytes_raw(),
-        )
+        """Generate the NLS RSA-3072 identity key pair as DER bytes."""
+        private = generate_private_key()
+        return private_key_der(private), public_key_der(private.public_key())
