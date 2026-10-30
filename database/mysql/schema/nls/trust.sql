@@ -1,44 +1,43 @@
--- NLS LSDB TRUST TABLE
+-- NLS TRUST TABLE
 --
--- Trust and cryptographic state associated with an NLS neighbor.
--- sync_key must contain protected/encrypted material or a secure key-store
--- reference. Do not store plaintext private asymmetric keys in MySQL.
+-- Stores NLS trust and cryptographic key state.
+-- Synchronous key material is referenced through secure key storage;
+-- asynchronous public-key material may be stored in this table.
 
-CREATE TABLE IF NOT EXISTS nls_lsdb_trust (
+CREATE TABLE IF NOT EXISTS nls_trust (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
-    -- Neighbor identity and reachability
+    -- Cross-table NLS identity mapping
+    router_id INT UNSIGNED NOT NULL,
     neighbor_id INT UNSIGNED NOT NULL,
-    interface_id VARCHAR(32) NOT NULL,
-    neighbor_ip VARCHAR(64) NOT NULL,
+    advertising_router INT UNSIGNED NOT NULL,
+    source_router_id INT UNSIGNED NOT NULL,
 
-    -- Key identity / rollover
+    -- Key identity and classification
     key_id INT UNSIGNED NOT NULL,
-    sync_key VARBINARY(512) NULL,
-    async_key VARBINARY(512) NULL,
-    key_status VARCHAR(32) NOT NULL DEFAULT 'ACTIVE',
+    key_version INT UNSIGNED NOT NULL,
+    key_type VARCHAR(32) NOT NULL,
+    key_tag VARCHAR(16) NOT NULL,
 
-    -- Protocol adjacency state
-    link_state VARCHAR(20) NOT NULL DEFAULT 'DOWN',
+    -- Synchronous / asynchronous cryptographic material
+    synchronous_key_ref VARCHAR(255) NULL,
+    synchronous_key_algorithm VARCHAR(64) NULL,
+    asynchronous_public_key BLOB NULL,
 
-    -- Security / traffic counters
-    rx_packet_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    tx_packet_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    auth_failure_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
-
-    -- Liveness
-    last_seen_timestamp TIMESTAMP NULL DEFAULT NULL,
-
-    -- Record lifecycle
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
+    -- Key lifecycle and trust monitoring
+    key_state VARCHAR(32) NOT NULL,
+    valid_from TIMESTAMP NULL DEFAULT NULL,
+    valid_until TIMESTAMP NULL DEFAULT NULL,
+    revoked_at TIMESTAMP NULL DEFAULT NULL,
+    trust_state VARCHAR(32) NOT NULL,
 
     PRIMARY KEY (id),
-    UNIQUE KEY uq_nls_lsdb_trust_neighbor_interface (neighbor_id, interface_id),
-    KEY idx_nls_lsdb_trust_neighbor (neighbor_id),
-    KEY idx_nls_lsdb_trust_key_id (key_id),
-    KEY idx_nls_lsdb_trust_key_status (key_status),
-    KEY idx_nls_lsdb_trust_link_state (link_state),
-    KEY idx_nls_lsdb_trust_last_seen (last_seen_timestamp)
+    UNIQUE KEY uq_nls_trust_key (router_id, key_id, key_version, key_tag),
+    KEY idx_nls_trust_neighbor (neighbor_id),
+    KEY idx_nls_trust_advertising_router (advertising_router),
+    KEY idx_nls_trust_source_router (source_router_id),
+    KEY idx_nls_trust_key_state (key_state),
+    KEY idx_nls_trust_trust_state (trust_state),
+    KEY idx_nls_trust_valid_until (valid_until),
+    KEY idx_nls_trust_revoked_at (revoked_at)
 );
