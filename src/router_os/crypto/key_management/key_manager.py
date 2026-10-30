@@ -15,7 +15,12 @@ class KeyManager:
         current = self.store.get("nls-synchronous")
         if current:
             return current
-        key = StoredKey("nls-synchronous", "symmetric", 1, secret=self.generator.synchronous_key())
+        key = StoredKey(
+            "nls-synchronous",
+            "symmetric-256",
+            1,
+            secret=self.generator.synchronous_key(32),
+        )
         self.store.put(key)
         return key
 
@@ -24,7 +29,13 @@ class KeyManager:
         if current:
             return current
         private, public = self.generator.asymmetric_keypair()
-        key = StoredKey("nls-identity", "ed25519", 1, public_key=public, secret=private)
+        key = StoredKey(
+            "nls-identity",
+            "rsa-3072",
+            1,
+            public_key=public,
+            secret=private,
+        )
         self.store.put(key)
         return key
 
