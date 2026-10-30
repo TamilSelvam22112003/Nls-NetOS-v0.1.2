@@ -1,26 +1,36 @@
--- NLS / OSPF NEIGHBOR TABLE
--- Stores protocol neighbors and their current neighbor state.
+-- OSPFv2 NEIGHBOR DATA STRUCTURE
+-- Relational representation of the OSPF Neighbor Data Structure from RFC 2328.
 
 CREATE TABLE IF NOT EXISTS nls_neighbor (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     router_id INT UNSIGNED NOT NULL,
-    neighbor_id INT UNSIGNED NOT NULL,
-    neighbor_ip VARBINARY(16) NOT NULL,
-    interface_id INT UNSIGNED NULL,
-    area_id INT UNSIGNED NOT NULL DEFAULT 0,
-    state VARCHAR(32) NOT NULL,
-    priority SMALLINT UNSIGNED NOT NULL DEFAULT 1,
-    dr_router_id INT UNSIGNED NULL,
-    bdr_router_id INT UNSIGNED NULL,
-    last_hello_at TIMESTAMP NULL DEFAULT NULL,
-    last_state_change_at TIMESTAMP NULL DEFAULT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    interface_id INT UNSIGNED NOT NULL,
+    area_id INT UNSIGNED NOT NULL,
 
-    PRIMARY KEY (id),
-    UNIQUE KEY uq_nls_neighbor (router_id, neighbor_id, interface_id),
-    KEY idx_nls_neighbor_neighbor_id (neighbor_id),
+    neighbor_id INT UNSIGNED NOT NULL,
+    neighbor_ip INT UNSIGNED NULL,
+    neighbor_priority TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    neighbor_options TINYINT UNSIGNED NOT NULL DEFAULT 0,
+
+    state VARCHAR(16) NOT NULL,
+    designated_router INT UNSIGNED NOT NULL DEFAULT 0,
+    backup_designated_router INT UNSIGNED NOT NULL DEFAULT 0,
+
+    dd_sequence_number INT UNSIGNED NULL,
+    last_dd_initialize BOOLEAN NOT NULL DEFAULT FALSE,
+    last_dd_more BOOLEAN NOT NULL DEFAULT FALSE,
+    last_dd_master BOOLEAN NOT NULL DEFAULT FALSE,
+    last_dd_options TINYINT UNSIGNED NULL,
+    last_dd_sequence_number INT UNSIGNED NULL,
+
+    -- OSPF neighbor LSA lists.
+    -- Each value contains the LSA identity tuples maintained by the
+    -- protocol: (LS type, Link State ID, Advertising Router).
+    link_state_retransmission_list JSON NULL,
+    database_summary_list JSON NULL,
+    link_state_request_list JSON NULL,
+
+    PRIMARY KEY (router_id, interface_id, neighbor_id),
+    KEY idx_nls_neighbor_area (area_id),
     KEY idx_nls_neighbor_state (state),
-    KEY idx_nls_neighbor_interface (interface_id),
-    KEY idx_nls_neighbor_updated_at (updated_at)
+    KEY idx_nls_neighbor_ip (neighbor_ip)
 );
