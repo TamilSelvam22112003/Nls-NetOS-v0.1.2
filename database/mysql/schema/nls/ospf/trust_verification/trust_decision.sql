@@ -1,0 +1,25 @@
+-- NLS/OSPF Trust Decision
+CREATE TABLE IF NOT EXISTS trust_decision (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    session_id BIGINT UNSIGNED NOT NULL,
+    router_id VARCHAR(64) NOT NULL,
+    router_ip VARCHAR(64) NULL,
+    public_key_fingerprint CHAR(64) NULL,
+    certificate_fingerprint CHAR(64) NULL,
+    trust_state VARCHAR(32) NOT NULL,
+    trust_level VARCHAR(32) NULL,
+    decision VARCHAR(32) NOT NULL,
+    neighbor_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    adjacency_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    lsdb_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    topology_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    routing_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    lsa_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    valid_from DATETIME(6) NULL,
+    valid_until DATETIME(6) NULL,
+    decided_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    KEY idx_trust_decision_session (session_id),
+    KEY idx_trust_decision_router (router_id, router_ip),
+    CONSTRAINT fk_trust_decision_session FOREIGN KEY (session_id) REFERENCES verification_session(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
