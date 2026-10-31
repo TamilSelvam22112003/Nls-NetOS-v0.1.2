@@ -1,0 +1,20 @@
+-- NLS/OSPF Operational Overview
+CREATE TABLE IF NOT EXISTS overview (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    router_id VARCHAR(64) NOT NULL,
+    router_ip VARCHAR(64) NULL,
+    area_id VARCHAR(64) NULL,
+    router_state VARCHAR(32) NOT NULL DEFAULT 'UP',
+    neighbor_count INT UNSIGNED NOT NULL DEFAULT 0,
+    adjacency_count INT UNSIGNED NOT NULL DEFAULT 0,
+    lsa_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    lsdb_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    topology_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    route_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    spf_runs BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    last_spf_at DATETIME(6) NULL,
+    last_lsa_change_at DATETIME(6) NULL,
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_overview_router (router_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
