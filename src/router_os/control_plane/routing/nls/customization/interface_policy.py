@@ -1,33 +1,21 @@
-"""NLS-specific interface classification policy."""
-
-from __future__ import annotations
-
+"""LAN/WAN/P2P and management interface policy."""
 from dataclasses import dataclass
+from enum import Enum
 
-from .config import NLSCustomization
-
+class InterfaceRole(str, Enum):
+    LAN = "lan"
+    WAN = "wan"
+    P2P = "p2p"
+    LOOPBACK = "loopback"
+    MANAGEMENT = "management"
+    UNKNOWN = "unknown"
 
 @dataclass(frozen=True)
-class InterfaceClassification:
-    classification: str
-    source: str
-    reason: str
+class InterfacePolicy:
+    role: InterfaceRole = InterfaceRole.UNKNOWN
+    nls_enabled: bool = True
+    passive: bool = False
+    neighbor_discovery: bool = True
 
-
-class NLSInterfacePolicy:
-    """Applies NLS operator overrides before generic inference."""
-
-    def __init__(self, customization: NLSCustomization | None = None) -> None:
-        self.customization = customization or NLSCustomization()
-
-    def classify(self, interface_name: str, *, loopback: bool = False, point_to_point: bool = False) -> InterfaceClassification:
-        override = self.customization.classify_override(interface_name)
-        if override:
-            return InterfaceClassification(override, "CONFIGURED", "NLS interface override")
-        if loopback:
-            return InterfaceClassification("LOOPBACK", "DISCOVERED", "loopback interface")
-        if point_to_point:
-            return InterfaceClassification("POINT_TO_POINT", "DISCOVERED", "point-to-point link")
-        if self.customization.allow_inferred_classification:
-            return InterfaceClassification("UNKNOWN", "INFERRED", "no NLS classification override")
-        return InterfaceClassification("UNKNOWN", "POLICY", "inference disabled")
+    def allows_nls(self) -> bool:
+        return self.nls_enabled and not self.passive

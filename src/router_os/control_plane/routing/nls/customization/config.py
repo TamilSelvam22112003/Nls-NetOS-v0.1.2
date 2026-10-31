@@ -1,50 +1,24 @@
-"""Central NLS customization points.
-
-These defaults are intentionally protocol-specific rather than buried inside
-socket, packet, or Linux-integration code.  Operators can replace the policy
-object when adapting NLS to a deployment without changing the observation
-engine.
-"""
-
-from __future__ import annotations
-
+"""Central NLS customization configuration."""
 from dataclasses import dataclass, field
-from typing import FrozenSet
 
-
-@dataclass(frozen=True)
-class NLSCustomization:
-    """Configuration used by the NLS network-observation subsystem."""
-
-    protocol_name: str = "NLS"
-    control_plane_protocols: FrozenSet[int] = field(default_factory=frozenset)
-    managed_interface_prefixes: tuple[str, ...] = ()
-    management_interface_names: FrozenSet[str] = field(default_factory=frozenset)
-    lan_interface_names: FrozenSet[str] = field(default_factory=frozenset)
-    wan_interface_names: FrozenSet[str] = field(default_factory=frozenset)
-    point_to_point_interface_names: FrozenSet[str] = field(default_factory=frozenset)
+@dataclass
+class NLSConfig:
+    protocol_enabled: bool = True
+    enable_ipv4: bool = True
+    enable_ipv6: bool = True
     enable_neighbor_discovery: bool = True
-    enable_socket_inventory: bool = True
-    enable_netlink_monitor: bool = True
-    allow_inferred_classification: bool = True
+    max_packet_size: int = 4096
+    hello_interval: float = 10.0
+    dead_interval: float = 40.0
+    rsa_key_size: int = 3072
+    interface_overrides: dict[str, str] = field(default_factory=dict)
 
-    def classify_override(self, interface_name: str) -> str | None:
-        """Return an explicit NLS classification override, if configured."""
-        if interface_name in self.management_interface_names:
-            return "MANAGEMENT"
-        if interface_name in self.lan_interface_names:
-            return "LAN"
-        if interface_name in self.wan_interface_names:
-            return "WAN"
-        if interface_name in self.point_to_point_interface_names:
-            return "POINT_TO_POINT"
-        return None
-
-
-def load_defaults() -> NLSCustomization:
-    """Return the default NLS policy.
-
-    Deployment-specific values should be supplied by the NLS configuration
-    layer; this module deliberately contains no host-specific assumptions.
-    """
-    return NLSCustomization()
+    def validate(self) -> None:
+        if self.max_packet_size <= 0:
+            raise ValueError("max_packet_size must be positive")
+        if self.hello_interval <= 0 or self.dead_interval <= 0:
+            raise ValueError("NLS timers must be positive")
+        if self.dead_interval < self.hello_interval:
+            raise ValueError("dead_interval must be >= hello_interval")
+        if self.rsa_key_size < 3072:
+            raise ValueError("NLS requires RSA-3072 or stronger")
