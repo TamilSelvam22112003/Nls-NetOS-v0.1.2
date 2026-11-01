@@ -1,3 +1,0 @@
-../../../platform/drivers/nic/nls-dpdk-forwarder usr/lib/nls-netos
-../../../src/router_os usr/lib/nls-netos
-bin/nls usr/bin

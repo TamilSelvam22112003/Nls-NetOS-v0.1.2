@@ -1,1 +1,0 @@
-"""NLS socket subsystem."""
