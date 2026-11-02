@@ -1,0 +1,12 @@
+router:
+  hostname: nls-router
+  router_id: 1.1.1.1
+
+nls:
+  enabled: true
+
+interfaces:
+  - name: eth0
+    role: lan
+  - name: eth1
+    role: wan

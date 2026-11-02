@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nls-netos"
+version = "0.1.2"
+description = "Prototype router operating system runtime for NLS-NetOS"
+requires-python = ">=3.10"
+dependencies = ["PyYAML>=6.0,<7.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
