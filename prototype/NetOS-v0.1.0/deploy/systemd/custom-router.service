@@ -1,0 +1,17 @@
+[Unit]
+Description=NetOS custom router onboarding
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=netos-router
+Group=netos-router
+WorkingDirectory=/opt/netos
+Environment=NETOS_IDENTITY_PASSPHRASE_FILE=/etc/netos/identity-passphrase
+ExecStart=/usr/local/bin/netos-router
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
