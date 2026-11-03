@@ -1,0 +1,14 @@
+organization_name: Example Router Org
+validator_addresses:
+  - 127.0.0.1:12346
+  - 127.0.0.1:12347
+  - 127.0.0.1:12348
+validator_root_ca: certs/root-ca.pem
+identity_store: ./runtime/device-boardid.key.enc
+identity_passphrase_env: NETOS_IDENTITY_PASSPHRASE
+serial: NETOS-TEST-0001
+chassis: NETOS-CHASSIS-001
+board_id: NETOS-BOARD-001
+controller_timeout_seconds: 10
+retry_initial_milliseconds: 250
+retry_max_milliseconds: 10000
