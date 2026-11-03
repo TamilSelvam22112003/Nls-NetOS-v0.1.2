@@ -12,12 +12,12 @@ import (
 
 	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/config"
 	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/internal/boot"
-	ncrypto "github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/internal/crypto"
-	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/internal/identity"
-	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/internal/protocol"
-	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/internal/routerca"
-	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/internal/validator"
-	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.2/prototype/NetOS-v0.1.0/pkg/logging"
+	ncrypto "github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/internal/crypto"
+	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/internal/identity"
+	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/internal/protocol"
+	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/internal/routerca"
+	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/internal/validator"
+	"github.com/TamilSelvam22112003/Nls-NetOS-v0.1.0/pkg/logging"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		if !cfgCA.Enabled { fmt.Println("Router-CA disabled; waiting for enable"); time.Sleep(500 * time.Millisecond); continue }
 		child, cancel := context.WithCancel(ctx)
 		go watchRouterCA(child, cancel, caStore)
-		err = runOnboarding(child)
+		err = runOnboarding(child, cfgCA)
 		cancel()
 		if err != nil && child.Err() == nil { fmt.Printf("Router-CA onboarding stopped: %v\n", err) }
 	}
@@ -44,8 +44,9 @@ func watchRouterCA(ctx context.Context, cancel context.CancelFunc, store *router
 	} }
 }
 
-func runOnboarding(ctx context.Context) error {
-	cfg, err := config.Load(ctx, "config/router.yaml"); if err != nil { return err }
+func runOnboarding(ctx context.Context, ca routerca.Config) error {
+	if len(ca.ValidatorAddresses) == 0 || ca.Organization == "" || ca.RootCA == "" || ca.IdentityStore == "" || ca.IdentityPassphrase == "" || ca.Serial == "" || ca.Chassis == "" || ca.BoardID == "" { return fmt.Errorf("Router-CA is enabled but its persistent configuration is incomplete") }
+	cfg := config.Config{OrganizationName: ca.Organization, ValidatorAddresses: ca.ValidatorAddresses, ValidatorRootCA: ca.RootCA, IdentityStore: ca.IdentityStore, IdentityPassphraseEnv: ca.IdentityPassphrase, Serial: ca.Serial, Chassis: ca.Chassis, BoardID: ca.BoardID, ControllerTimeout: 10 * time.Second, RetryInitial: ca.RetryInitial, RetryMax: ca.RetryMax}
 	pass := os.Getenv(cfg.IdentityPassphraseEnv); if pass == "" { return fmt.Errorf("identity passphrase environment variable is empty") }
 	store := identity.FileStore{Path: cfg.IdentityStore, Passphrase: pass}
 	key, cert, err := store.Load()
