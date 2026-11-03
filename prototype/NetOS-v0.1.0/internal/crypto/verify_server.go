@@ -1,0 +1,6 @@
+package crypto
+
+import("crypto/x509";"encoding/pem";"fmt";"os";"strings")
+// VerifyServer verifies the server certificate chain against rootPath and its O organization against organization.
+func VerifyServer(peer []*x509.Certificate,rootPath,organization string)error{if len(peer)==0{return fmt.Errorf("verify server: peer certificate chain is empty")};b,e:=os.ReadFile(rootPath);if e!=nil{return fmt.Errorf("read root CA: %w",e)};roots:=x509.NewCertPool();added:=false;for{p,r:=pem.Decode(b);if p==nil{break};b=r;if p.Type=="CERTIFICATE"{c,e:=x509.ParseCertificate(p.Bytes);if e!=nil{return fmt.Errorf("parse root CA: %w",e)};roots.AddCert(c);added=true}};if !added{return fmt.Errorf("verify server: root CA is empty")};opts:=x509.VerifyOptions{Roots:roots,Intermediates:x509.NewCertPool()};for _,c:=range peer[1:]{opts.Intermediates.AddCert(c)};if _,e:=peer[0].Verify(opts);e!=nil{return fmt.Errorf("verify server chain: %w",e)};if len(peer[0].Subject.Organization)==0||!strings.EqualFold(peer[0].Subject.Organization[0],organization){return fmt.Errorf("verify server organization: got %q want %q",firstOrg(peer[0]),organization)};return nil}
+func firstOrg(c *x509.Certificate)string{if len(c.Subject.Organization)>0{return c.Subject.Organization[0]};return ""}
