@@ -1,0 +1,5 @@
+cryptography>=42.0
+PyYAML>=6.0
+scapy>=2.5
+psutil>=5.9
+pyroute2>=0.7
