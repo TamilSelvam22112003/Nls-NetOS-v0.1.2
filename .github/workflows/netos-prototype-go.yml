@@ -1,0 +1,21 @@
+name: NetOS prototype Go tests
+
+on:
+  push:
+    branches:
+      - feat/netos-v0.1.0-router-ca-lab
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prototype/NetOS-v0.1.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - run: go test ./...
+      - run: go vet ./...
