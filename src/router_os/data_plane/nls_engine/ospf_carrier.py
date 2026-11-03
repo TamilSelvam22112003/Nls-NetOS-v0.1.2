@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from hmac import compare_digest
 import struct
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -15,7 +14,7 @@ FLAG_AUTHENTICATED = 0x40
 
 
 class CarrierError(ValueError):
-    pass
+    """Raised when an NLS-OSPF carrier packet is invalid."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +27,7 @@ class NLSHeader:
     reserved: int
     context_id: int
     transaction_id: int
+    extension: int = 0
 
     def validate(self, actual_length: int) -> None:
         if self.version != NLS_VERSION or self.hlen_words != 5:
@@ -42,20 +42,18 @@ class NLSHeader:
             raise CarrierError("OSPF carrier requires an established context")
 
     def encode(self) -> bytes:
-        # Wire layout is the currently specified 20-byte logical layout.
         return struct.pack(
-            "!BBBBHHIII",
+            "!BBBBHHIII I",
             self.version, self.hlen_words, self.ptype, self.flags,
             self.total_length, self.reserved, self.context_id,
-            self.transaction_id, 0,
+            self.transaction_id, self.extension,
         )
 
     @classmethod
     def decode(cls, data: bytes) -> "NLSHeader":
         if len(data) < NLS_HEADER_BYTES:
             raise CarrierError("truncated NLS header")
-        values = struct.unpack("!BBBBHHIII", data[:NLS_HEADER_BYTES])
-        return cls(*values[:8])
+        return cls(*struct.unpack("!BBBBHHIII I", data[:NLS_HEADER_BYTES]))
 
 
 @dataclass(slots=True)
@@ -118,15 +116,12 @@ class SessionTable:
             raise CarrierError("unknown NLS session context") from exc
 
     def accept_counter(self, context_id: int, counter: int) -> bool:
-        self.lookup(context_id)
         return self._replay[context_id].accept(counter)
 
 
 def build_nonce(context_id: int, transaction_id: int) -> bytes:
-    if not 0 <= context_id <= 0xFFFFFFFF or not 0 <= transaction_id <= 0xFFFFFFFF:
-        raise ValueError("nonce components must be uint32")
-    # Prototype nonce construction is deterministic and unique only if the
-    # sender guarantees a never-reused transaction ID per context.
+    if not 0 <= context_id <= 0xFFFFFFFF or not 0 <= transaction_id <= 0xFFFFFFFFFFFFFFFF:
+        raise ValueError("nonce components out of range")
     return struct.pack("!IQ", context_id, transaction_id)
 
 
@@ -134,12 +129,13 @@ def protect_ospf(session: NLSSession, header: NLSHeader, ospf_payload: bytes) ->
     if header.context_id != session.context_id:
         raise CarrierError("session/header context mismatch")
     nonce = build_nonce(header.context_id, header.transaction_id)
-    aad = header.encode()
-    ciphertext = AESGCM(session.key).encrypt(nonce, ospf_payload, aad)
-    total = NLS_HEADER_BYTES + len(ciphertext)
-    final_header = NLSHeader(header.version, header.hlen_words, header.ptype, header.flags,
-                             total, header.reserved, header.context_id, header.transaction_id)
-    return final_header.encode() + ciphertext
+    # The header is authenticated as AAD; the AEAD tag remains outside it.
+    provisional = NLSHeader(header.version, header.hlen_words, header.ptype,
+                            header.flags, NLS_HEADER_BYTES + len(ospf_payload) + 16,
+                            header.reserved, header.context_id, header.transaction_id,
+                            header.extension)
+    ciphertext = AESGCM(session.key).encrypt(nonce, ospf_payload, provisional.encode())
+    return provisional.encode() + ciphertext
 
 
 def open_ospf(table: SessionTable, packet: bytes) -> tuple[NLSHeader, bytes]:
