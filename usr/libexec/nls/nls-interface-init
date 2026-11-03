@@ -1,0 +1,4 @@
+#!/bin/sh
+# nls-interface-init: implementation supplied by the NLS runtime package.
+echo "nls-interface-init: not implemented" >&2
+exit 127

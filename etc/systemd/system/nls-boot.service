@@ -1,0 +1,17 @@
+[Unit]
+Description=NLS BOOT service
+After=network.target
+
+[Service]
+Type=simple
+User=nls
+Group=nls
+ExecStart=/usr/sbin/nls-boot
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

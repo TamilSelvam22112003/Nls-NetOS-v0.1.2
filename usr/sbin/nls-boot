@@ -1,0 +1,3 @@
+#!/bin/sh
+# NLS nls-boot administrative entry point.
+exec python3 -m nls.cli nls_boot "$@"

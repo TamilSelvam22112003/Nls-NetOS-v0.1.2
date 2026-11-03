@@ -1,0 +1,3 @@
+# var/lib/nls/keys/session
+
+Runtime state directory. The installer creates this path with restrictive ownership and permissions. Do not commit production keys, certificates, databases, sessions, replay counters, logs, or backups.

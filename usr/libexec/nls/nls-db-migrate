@@ -1,0 +1,4 @@
+#!/bin/sh
+# nls-db-migrate: implementation supplied by the NLS runtime package.
+echo "nls-db-migrate: not implemented" >&2
+exit 127

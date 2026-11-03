@@ -1,0 +1,4 @@
+logging:
+  directory: /var/log/nls
+  level: INFO
+  format: json

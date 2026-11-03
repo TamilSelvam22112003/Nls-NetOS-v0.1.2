@@ -1,0 +1,4 @@
+#!/bin/sh
+# nls-system-check: implementation supplied by the NLS runtime package.
+echo "nls-system-check: not implemented" >&2
+exit 127

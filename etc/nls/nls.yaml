@@ -1,0 +1,6 @@
+# NLS top-level configuration
+schema_version: 1
+system:
+  name: NLS
+  mode: router
+  environment: development

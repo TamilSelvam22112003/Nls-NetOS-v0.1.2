@@ -1,0 +1,3 @@
+#!/bin/sh
+# NLS nls-diagnostics entry point; implementation will be installed with the NLS package.
+exec python3 -m nls.cli nls_diagnostics "$@"

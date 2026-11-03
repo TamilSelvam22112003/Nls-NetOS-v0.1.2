@@ -1,0 +1,3 @@
+router_ca:
+  enabled: false
+  trust_store: /var/lib/nls/certificates/ca

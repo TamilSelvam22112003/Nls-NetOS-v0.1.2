@@ -1,0 +1,4 @@
+database:
+  driver: sqlite
+  path: /var/lib/nls/database/nls.db
+  journal_mode: WAL

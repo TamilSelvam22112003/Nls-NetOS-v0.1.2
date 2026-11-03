@@ -1,0 +1,2 @@
+# Configure interface names and addressing on the target host.
+interfaces: []

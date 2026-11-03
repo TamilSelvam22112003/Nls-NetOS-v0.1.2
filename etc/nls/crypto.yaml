@@ -1,0 +1,5 @@
+crypto:
+  data_cipher: AES-256-GCM
+  key_agreement: X25519
+  kdf: HKDF-SHA256
+  nonce_bytes: 12

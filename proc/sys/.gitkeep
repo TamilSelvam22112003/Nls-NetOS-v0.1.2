@@ -1,0 +1,3 @@
+# proc/sys
+
+This is a runtime-managed filesystem location. The operating system creates/populates it at boot; this repository stores no runtime state here.

@@ -1,0 +1,4 @@
+protocol:
+  name: NLS
+  version: 1
+  replay_window: 1024

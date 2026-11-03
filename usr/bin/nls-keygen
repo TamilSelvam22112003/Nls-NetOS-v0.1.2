@@ -1,0 +1,3 @@
+#!/bin/sh
+# NLS nls-keygen entry point; implementation will be installed with the NLS package.
+exec python3 -m nls.cli nls_keygen "$@"

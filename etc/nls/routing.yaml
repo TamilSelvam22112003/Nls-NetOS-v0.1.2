@@ -1,0 +1,4 @@
+routing:
+  backend: frr
+  protocols: [ospf, ospf6]
+  manage_default_route: false

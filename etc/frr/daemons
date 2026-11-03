@@ -1,0 +1,5 @@
+# FRR daemon enablement is provisioned by the package installer.
+zebra=yes
+ospfd=yes
+ospf6d=yes
+staticd=yes

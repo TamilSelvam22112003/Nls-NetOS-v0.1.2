@@ -1,0 +1,4 @@
+boot:
+  product: NLS
+  config: /etc/nls/nls.yaml
+  initramfs: distribution-generated

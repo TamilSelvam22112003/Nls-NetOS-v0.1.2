@@ -1,0 +1,4 @@
+security:
+  require_router_certificate: true
+  replay_protection: true
+  fail_closed: true

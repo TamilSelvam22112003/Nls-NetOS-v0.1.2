@@ -1,0 +1,4 @@
+# System identity and lifecycle settings
+hostname: nls-router
+log_level: INFO
+startup_timeout_seconds: 60

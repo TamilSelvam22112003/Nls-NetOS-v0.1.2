@@ -1,0 +1,4 @@
+key_management:
+  provider: file
+  key_directory: /var/lib/nls/keys
+  private_keys_in_repository: false
