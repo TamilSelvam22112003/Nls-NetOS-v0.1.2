@@ -1,0 +1,14 @@
+organization: NLS-LAB
+validator: 127.0.0.1:12346
+validator_ports: [12346, 12347, 12348]
+root_ca: certs/root-ca.pem
+device_certificate: certs/device-boardid.pem
+device_key: certs/device-boardid.key.enc
+serial: NLS-TEST-0001
+chassis: LAB-CHASSIS-01
+board_id: LAB-BOARD-01
+auto_enroll: false
+retry_initial_ms: 250
+retry_max_ms: 5000
+controller_timeout_seconds: 5
+manager_timeout_seconds: 5
