@@ -1,0 +1,6 @@
+package crypto
+import("context";"crypto/tls";"crypto/x509";"fmt";"net";"os";"time";"github.com/pion/dtls/v2")
+// DTLSClient creates authenticated DTLS 1.2 Validator connections.
+type DTLSClient struct{RootCAPath,Organization string;Certificate tls.Certificate;Timeout time.Duration}
+// Dial opens DTLS and explicitly verifies the server organization and root chain.
+func(c DTLSClient)Dial(ctx context.Context,address string)(net.Conn,error){rb,e:=os.ReadFile(c.RootCAPath);if e!=nil{return nil,fmt.Errorf("read root CA: %w",e)};roots:=x509.NewCertPool();if !roots.AppendCertsFromPEM(rb){return nil,fmt.Errorf("load root CA")};cfg:=&dtls.Config{Certificates:[]tls.Certificate{c.Certificate},RootCAs:roots,InsecureSkipVerify:true,VerifyPeerCertificate:func(raw,_ [][]*x509.Certificate)error{return VerifyServerCertificate(raw,c.RootCAPath,c.Organization)}};d:=net.Dialer{Timeout:c.Timeout};udp,e:=d.DialContext(ctx,"udp",address);if e!=nil{return nil,fmt.Errorf("dial Validator: %w",e)};conn,e:=dtls.Client(udp,cfg);if e!=nil{udp.Close();return nil,fmt.Errorf("create DTLS client: %w",e)};if e=conn.HandshakeContext(ctx);e!=nil{conn.Close();return nil,fmt.Errorf("DTLS handshake: %w",e)};return conn,nil}
