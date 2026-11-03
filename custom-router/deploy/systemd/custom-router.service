@@ -1,0 +1,22 @@
+[Unit]
+Description=Custom Router Lab Onboarding
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=custom-router
+Group=custom-router
+WorkingDirectory=/opt/custom-router
+Environment=CUSTOM_ROUTER_KEY_PASSPHRASE_FILE=/etc/custom-router/key-passphrase
+ExecStart=/opt/custom-router/custom-router
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/custom-router
+
+[Install]
+WantedBy=multi-user.target
